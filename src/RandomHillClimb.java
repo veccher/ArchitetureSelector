@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class RandomHillClimb {
-	public static void main(String[] args)
+	public void run()
 	{
 		int nLayers=3;
 		Random rand=new Random();
@@ -43,7 +43,7 @@ public class RandomHillClimb {
 				{
 					for (int add=-1;add<2;add+=2)
 					{
-						temp2Arch.clear();
+						temp2Arch=new ArrayList<Integer>();
 						temp2Arch.addAll(currentArch);
 						temp2Arch.set(camada, temp2Arch.get(camada)+add);
 						//MLP net=new MLP(temp2Arch);
@@ -60,12 +60,12 @@ public class RandomHillClimb {
 				for (ArrayList<Integer> neighboor : neighborhood)
 				{
 					MLP net=(new MLP(neighboor));
-					System.out.println("arq: "+temp2Arch+" precisao: " +net.classify());
-					if(net.getResults()>temp)
+					System.out.println("arq: "+neighboor+" precisao: " +net.classify());
+					if(net.getResults()>top)
 					{
 						temp=net.getResults();
 						tempArch.clear();
-						tempArch.addAll(temp2Arch);
+						tempArch.addAll(neighboor);
 						break;
 					}
 				}

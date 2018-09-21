@@ -5,6 +5,8 @@ import java.util.Random;
 public class SimulatedAnnealing {
 	float heat = 100;
 	float decayRate = 3;
+	int maxStopped=3;
+	int countdown=maxStopped;
 	boolean isRandom()
 	{
 		Random rand=new Random();
@@ -13,9 +15,10 @@ public class SimulatedAnnealing {
 			return false;
 		return true;
 	}
-	public static void main(String[] args)
+	public void run()
 	{
-		int nLayers=3;
+		ArrayList<ArrayList<Integer>> neighborhood = new ArrayList<ArrayList<Integer>>();
+		int nLayers=2;
 		Random rand=new Random();
 		float top=0;
 		ArrayList<Integer> currentArch = new ArrayList<Integer>();
@@ -47,27 +50,65 @@ public class SimulatedAnnealing {
 				ArrayList<Integer> tempArch = new ArrayList<Integer>();
 				ArrayList<Integer> temp2Arch = new ArrayList<Integer>();
 				System.out.println("Arch Atual: "+currentArch+"precisão: "+top);
+				neighborhood = new ArrayList<ArrayList<Integer>>();
 				for (int camada=0;camada<currentArch.size();camada++)
 				{
 					for (int add=-1;add<2;add+=2)
 					{
-						temp2Arch.clear();
+						temp2Arch=new ArrayList<Integer>();
 						temp2Arch.addAll(currentArch);
 						temp2Arch.set(camada, temp2Arch.get(camada)+add);
-						MLP net=new MLP(temp2Arch);
-						System.out.println("camada "+camada+" incremento: "+add+" arq: "+temp2Arch+" precisao: " +net.classify());
-						if(net.getResults()>temp)
+						//MLP net=new MLP(temp2Arch);
+						neighborhood.add(temp2Arch);
+						//System.out.println("camada "+camada+" incremento: "+add+" arq: "+temp2Arch+" precisao: " +net.classify());
+						/*if(net.getResults()>temp)
 						{
 							temp=net.getResults();
 							tempArch.clear();
 							tempArch.addAll(temp2Arch);
-						}
+						}*/
 					}
 				}
-				if (temp<=top)
-					break;
-				top=temp;
-				currentArch=tempArch;
+				if (this.isRandom())
+				{
+					ArrayList<Integer> neighbor=neighborhood.get(rand.nextInt(neighborhood.size()));
+					MLP net=new MLP(neighbor);
+					temp=net.classify();
+					currentArch.clear();
+					currentArch.addAll(neighbor);
+					if (temp>top)
+						top=temp;
+				}
+				else 
+				{
+					for (ArrayList<Integer> neighboor : neighborhood)
+					{
+						MLP net=(new MLP(neighboor));
+						System.out.println("arq: "+neighboor+" precisao: " +net.classify());
+						if(net.getResults()>top)
+						{
+							temp=net.getResults();
+							tempArch.clear();
+							tempArch.addAll(neighboor);
+							break;
+						}
+					}
+					if (temp<=top)
+					{
+						if (--countdown==0)
+							break;
+					}
+					else 
+					{
+						countdown=maxStopped;
+						
+					}
+				}
+				if (temp>top)
+				{
+					top=temp;
+					currentArch=tempArch;
+				}
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

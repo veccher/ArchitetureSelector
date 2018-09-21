@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GreedyHillClimb {
-	public static void main(String[] args)
+	public void run()
 	{
 		int nLayers=3;
 		Random rand=new Random();
