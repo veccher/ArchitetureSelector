@@ -29,9 +29,9 @@ public class MLP implements Runnable{
 			options="";
 		//System.out.println(options);
 	}
-	public MLP (ArrayList<Integer> layers) throws IOException
+	public MLP (ArrayList<Integer> layers, String fileName) throws IOException
 	{
-		BufferedReader reader =new BufferedReader(new FileReader("iris.arff"));
+		BufferedReader reader =new BufferedReader(new FileReader(fileName));
 		ArffReader arff = new ArffReader(reader);
 		this.data = arff.getData();
 		data.setClassIndex(data.numAttributes() - 1);
@@ -63,7 +63,7 @@ public class MLP implements Runnable{
 			}
 			
 			//System.out.print("taxa de acerto no conjunto="+acertosCamada*100f/j+"%\n");
-				
+			
 		}
 		this.precision=acertoTotal*100f/testeTotal;
 		notify();

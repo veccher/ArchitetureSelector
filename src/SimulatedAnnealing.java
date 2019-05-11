@@ -2,11 +2,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SimulatedAnnealing {
+public class SimulatedAnnealing implements ArchitectureSelector{
 	float heat = 100;
 	float decayRate = 3;
 	int maxStopped=3;
 	int countdown=maxStopped;
+	int nLayers;
+	ArrayList<Integer> initialArch;
+	String fileName;
+	
+	public SimulatedAnnealing(int nLayers, String fileName, ArrayList<Integer> initialArch)
+	{
+		this.nLayers=nLayers;
+		this.fileName=fileName;
+		this.initialArch=initialArch;
+	}
+	
 	boolean isRandom()
 	{
 		Random rand=new Random();
@@ -15,35 +26,18 @@ public class SimulatedAnnealing {
 			return false;
 		return true;
 	}
+	
+	
 	public void run()
 	{
 		ArrayList<ArrayList<Integer>> neighborhood = new ArrayList<ArrayList<Integer>>();
-		int nLayers=2;
+		int nLayers=3;
 		Random rand=new Random();
 		float top=0;
-		ArrayList<Integer> currentArch = new ArrayList<Integer>();
-		//random initialize
-		/*for (int j=0;j<60;j++)
-		{
-			currentArch = new ArrayList<Integer>();*/
-		for(int i=0;i<nLayers;i++)
-		{
-			currentArch.add(rand.nextInt(10)+1);
-		}/*
-			try {
-				MLP net=new MLP(currentArch);
-				System.out.println(j+ " " + net.classify());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}*/
+		ArrayList<Integer> currentArch = initialArch;
 		//iterate
 		try {
-			top=new MLP(currentArch).classify();
+			top=new MLP(currentArch, fileName).classify();
 			while(true)
 			{
 				float temp=0;
@@ -72,7 +66,7 @@ public class SimulatedAnnealing {
 				if (this.isRandom())
 				{
 					ArrayList<Integer> neighbor=neighborhood.get(rand.nextInt(neighborhood.size()));
-					MLP net=new MLP(neighbor);
+					MLP net=new MLP(neighbor, fileName);
 					temp=net.classify();
 					currentArch.clear();
 					currentArch.addAll(neighbor);
@@ -83,7 +77,7 @@ public class SimulatedAnnealing {
 				{
 					for (ArrayList<Integer> neighboor : neighborhood)
 					{
-						MLP net=(new MLP(neighboor));
+						MLP net=(new MLP(neighboor,fileName));
 						System.out.println("arq: "+neighboor+" precisao: " +net.classify());
 						if(net.getResults()>top)
 						{

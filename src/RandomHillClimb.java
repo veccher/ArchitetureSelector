@@ -2,36 +2,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class RandomHillClimb {
+public class RandomHillClimb implements ArchitectureSelector{
+	private ArrayList<Integer> initialArch;
+	private String fileName;
+	
+	public RandomHillClimb(ArrayList<Integer> initialArch, String fileName)
+	{
+		this.initialArch=initialArch;
+		this.fileName=fileName;
+	}
 	public void run()
 	{
-		int nLayers=3;
 		Random rand=new Random();
 		float top=0;
-		ArrayList<Integer> currentArch = new ArrayList<Integer>();
+		ArrayList<Integer> currentArch = initialArch;
 		ArrayList<ArrayList<Integer>> neighborhood = new ArrayList<ArrayList<Integer>>();
-		//random initialize
-		/*for (int j=0;j<60;j++)
-		{
-			currentArch = new ArrayList<Integer>();*/
-		for(int i=0;i<nLayers;i++)
-		{
-			currentArch.add(rand.nextInt(10)+1);
-		}/*
-			try {
-				MLP net=new MLP(currentArch);
-				System.out.println(j+ " " + net.classify());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}*/
 		//iterate
 		try {
-			top=new MLP(currentArch).classify();
+			top=new MLP(currentArch,fileName).classify();
 			while(true)
 			{
 				float temp=0;
@@ -59,7 +47,7 @@ public class RandomHillClimb {
 				}
 				for (ArrayList<Integer> neighboor : neighborhood)
 				{
-					MLP net=(new MLP(neighboor));
+					MLP net=(new MLP(neighboor,fileName));
 					System.out.println("arq: "+neighboor+" precisao: " +net.classify());
 					if(net.getResults()>top)
 					{
