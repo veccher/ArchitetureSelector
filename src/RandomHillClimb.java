@@ -5,11 +5,12 @@ import java.util.Random;
 public class RandomHillClimb implements ArchitectureSelector{
 	private ArrayList<Integer> initialArch;
 	private String fileName;
-	
+	Log log;
 	public RandomHillClimb(ArrayList<Integer> initialArch, String fileName)
 	{
 		this.initialArch=initialArch;
 		this.fileName=fileName;
+		log = new Log("RHC " +fileName.replace(".arff", "")+ " " +initialArch);
 	}
 	public void run()
 	{
@@ -20,6 +21,7 @@ public class RandomHillClimb implements ArchitectureSelector{
 		//iterate
 		try {
 			top=new MLP(currentArch,fileName).classify();
+			log.addLine(currentArch.toString() + " " + top);
 			while(true)
 			{
 				float temp=0;
@@ -49,6 +51,7 @@ public class RandomHillClimb implements ArchitectureSelector{
 				{
 					MLP net=(new MLP(neighboor,fileName));
 					System.out.println("arq: "+neighboor+" precisao: " +net.classify());
+					log.addLine(neighboor.toString() + " " + net.getResults());
 					if(net.getResults()>top)
 					{
 						temp=net.getResults();
@@ -56,12 +59,14 @@ public class RandomHillClimb implements ArchitectureSelector{
 						tempArch.addAll(neighboor);
 						break;
 					}
+					
 				}
 				if (temp<=top)
 					break;
 				top=temp;
 				currentArch=tempArch;
 			}
+			log.save();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

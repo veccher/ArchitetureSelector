@@ -10,12 +10,14 @@ public class SimulatedAnnealing implements ArchitectureSelector{
 	int nLayers;
 	ArrayList<Integer> initialArch;
 	String fileName;
+	Log log;
 	
-	public SimulatedAnnealing(int nLayers, String fileName, ArrayList<Integer> initialArch)
+	public SimulatedAnnealing(ArrayList<Integer> initialArch, String fileName)
 	{
-		this.nLayers=nLayers;
+		this.nLayers=initialArch.size();
 		this.fileName=fileName;
 		this.initialArch=initialArch;
+		log = new Log("SA " +fileName.replace(".arff", "")+ " " +initialArch);
 	}
 	
 	boolean isRandom()
@@ -33,14 +35,16 @@ public class SimulatedAnnealing implements ArchitectureSelector{
 		ArrayList<ArrayList<Integer>> neighborhood = new ArrayList<ArrayList<Integer>>();
 		int nLayers=3;
 		Random rand=new Random();
-		float top=0;
+		float top=-1;//top precision
+		float current=-1;//current precision
 		ArrayList<Integer> currentArch = initialArch;
 		//iterate
 		try {
-			top=new MLP(currentArch, fileName).classify();
+			top=current=new MLP(currentArch, fileName).classify();
+			log.addLine(currentArch.toString()+" "+top + " inicial");
+			//itera
 			while(true)
 			{
-				float temp=0;
 				ArrayList<Integer> tempArch = new ArrayList<Integer>();
 				ArrayList<Integer> temp2Arch = new ArrayList<Integer>();
 				System.out.println("Arch Atual: "+currentArch+"precisão: "+top);
@@ -52,42 +56,37 @@ public class SimulatedAnnealing implements ArchitectureSelector{
 						temp2Arch=new ArrayList<Integer>();
 						temp2Arch.addAll(currentArch);
 						temp2Arch.set(camada, temp2Arch.get(camada)+add);
-						//MLP net=new MLP(temp2Arch);
 						neighborhood.add(temp2Arch);
-						//System.out.println("camada "+camada+" incremento: "+add+" arq: "+temp2Arch+" precisao: " +net.classify());
-						/*if(net.getResults()>temp)
-						{
-							temp=net.getResults();
-							tempArch.clear();
-							tempArch.addAll(temp2Arch);
-						}*/
 					}
 				}
 				if (this.isRandom())
 				{
 					ArrayList<Integer> neighbor=neighborhood.get(rand.nextInt(neighborhood.size()));
 					MLP net=new MLP(neighbor, fileName);
-					temp=net.classify();
+					current=net.classify();
+					log.addLine(neighbor+ " " + current + " random");
 					currentArch.clear();
 					currentArch.addAll(neighbor);
-					if (temp>top)
-						top=temp;
 				}
 				else 
 				{
+					//faz uma iteração gulosa.
+					boolean climbed=false;
 					for (ArrayList<Integer> neighboor : neighborhood)
 					{
+						
 						MLP net=(new MLP(neighboor,fileName));
 						System.out.println("arq: "+neighboor+" precisao: " +net.classify());
-						if(net.getResults()>top)
+						if(net.getResults()>current)
 						{
-							temp=net.getResults();
-							tempArch.clear();
-							tempArch.addAll(neighboor);
-							break;
+							climbed=true;
+							current=net.getResults();
+							currentArch.clear();
+							currentArch.addAll(neighboor);
 						}
+						log.addLine(neighboor+" "+ net.getResults()+" greedy");
 					}
-					if (temp<=top)
+					if (!climbed)
 					{
 						if (--countdown==0)
 							break;
@@ -98,12 +97,12 @@ public class SimulatedAnnealing implements ArchitectureSelector{
 						
 					}
 				}
-				if (temp>top)
+				if (current>top)
 				{
-					top=temp;
-					currentArch=tempArch;
+					top=current;
 				}
 			}
+			log.save();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -5,11 +5,12 @@ import java.util.Random;
 public class GreedyHillClimb implements ArchitectureSelector{
 	private ArrayList<Integer> initialArch;
 	private String fileName;
-	
+	Log log;
 	public GreedyHillClimb(ArrayList<Integer> initialArch, String fileName)
 	{
 		this.initialArch=initialArch;
 		this.fileName=fileName;
+		log = new Log("GHC " +fileName.replace(".arff", "")+ " " +initialArch);
 	}
 	public void run()
 	{
@@ -20,6 +21,7 @@ public class GreedyHillClimb implements ArchitectureSelector{
 		//iterate
 		try {
 			top=new MLP(currentArch,fileName).classify();
+			log.addLine(currentArch.toString() + " " + top);
 			while(true)
 			{
 				float temp=0;
@@ -41,6 +43,7 @@ public class GreedyHillClimb implements ArchitectureSelector{
 							tempArch.clear();
 							tempArch.addAll(temp2Arch);
 						}
+						log.addLine(temp2Arch.toString() + " " + net.getResults());
 					}
 				}
 				if (temp<=top)
@@ -48,6 +51,7 @@ public class GreedyHillClimb implements ArchitectureSelector{
 				top=temp;
 				currentArch=tempArch;
 			}
+			log.save();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -44,5 +44,11 @@ public class RandomArchitectureSelector implements ArchitectureSelector{
 				e.printStackTrace();
 			}
 		}
+		try {
+			log.save();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

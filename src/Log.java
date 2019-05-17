@@ -18,7 +18,7 @@ public class Log {
 	}
 	public void save() throws IOException
 	{
-		FileOutputStream f=new FileOutputStream("/logs/"+logName);
+		FileOutputStream f=new FileOutputStream(logName);
 		f.write(log.getBytes());
 		f.close();
 	}
